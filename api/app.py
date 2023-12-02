@@ -12,8 +12,22 @@ def hello_world(user):
 def sum(x,y):
     return str(int(x) + int(y))
 
-@app.route("/model", methods=['POST'])
-def pred_model():
+def load_model():
+    model_svm = joblib.load("models/M23CSA004_svm_gamma:0.1_C:100.joblib")
+    model_tree = joblib.load("models/M23CSA004_tree_max_depth:20.joblib")
+    model_lr = joblib.load("models/M23CSA004_lr_solver:lbfgs.joblib")
+    return model_svm,model_tree,model_lr
+
+@app.route("/predict/<type>", methods=['POST'])
+def pred_model(type):
+    if(type=='svm'):
+        model = load_model()[0]
+    elif(type=='tree'):
+        model = load_model()[1]
+    elif(type=='lr'):
+        model = load_model()[2]
+
+
     js = request.get_json()
         
     image = js['image']
@@ -22,6 +36,8 @@ def pred_model():
     return str(predict)
 
 @app.route("/compare", methods=['POST'])
+
+
 def compare_images():
     js = request.get_json()
     image1 = np.array(js['image1'])
